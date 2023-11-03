@@ -1,12 +1,14 @@
+import { auth } from '@clerk/nextjs';
 import { LayoutDashboard } from 'lucide-react';
 import { redirect } from 'next/navigation';
-import { auth } from '@clerk/nextjs';
 
 import { IconBadge } from '@/components/icon-badge';
 import { db } from '@/lib/db';
-import { TitleForm } from './components/title-form';
+
+import { CategoryForm } from './components/category-form';
 import { DescriptionForm } from './components/description-form';
 import { ImageForm } from './components/image-form';
+import { TitleForm } from './components/title-form';
 
 const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
   const { userId } = auth();
@@ -19,6 +21,12 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
     where: {
       id: params.courseId,
       userId,
+    },
+  });
+
+  const categories = await db.category.findMany({
+    orderBy: {
+      name: 'asc',
     },
   });
 
@@ -56,6 +64,14 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
           <TitleForm initialData={course} courseId={params.courseId} />
           <DescriptionForm initialData={course} courseId={params.courseId} />
           <ImageForm initialData={course} courseId={params.courseId} />
+          <CategoryForm
+            initialData={course}
+            courseId={course.id}
+            options={categories.map((category) => ({
+              label: category.name,
+              value: category.id,
+            }))}
+          />
         </div>
       </div>
     </div>
