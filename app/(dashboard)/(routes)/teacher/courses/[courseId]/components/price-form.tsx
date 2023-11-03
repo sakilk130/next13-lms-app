@@ -61,14 +61,14 @@ const PriceForm: FC<PriceFormProps> = ({ courseId, initialData }) => {
   return (
     <div className="p-4 mt-6 border rounded-md bg-slate-100">
       <div className="flex items-center justify-between font-medium">
-        Course description
+        Course price
         <Button variant="ghost" type="button" onClick={toggleEdit}>
           {isEditing ? (
             'Cancel'
           ) : (
             <>
               <Pencil className="w-4 h-4 mr-2" />
-              Edit description
+              Edit price
             </>
           )}
         </Button>
