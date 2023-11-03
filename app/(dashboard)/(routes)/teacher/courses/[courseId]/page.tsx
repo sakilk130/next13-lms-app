@@ -36,8 +36,6 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
   const completedFields = requiredFields.filter((field) => !!field).length;
   const completionText = `${completedFields}/${totalFields}`;
 
-  console.log(course);
-
   return (
     <div className="p-6">
       <div className="flex items-center justify-between">
