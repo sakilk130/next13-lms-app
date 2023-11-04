@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { IconBadge } from '@/components/icon-badge';
 import { db } from '@/lib/db';
 import { ChapterTitleForm } from './components/chapter-title-form';
+import { ChapterDescriptionForm } from './components/chapter-description-form';
 
 const ChapterIdPage = async ({
   params,
@@ -67,6 +68,11 @@ const ChapterIdPage = async ({
             chapterId={params.chapterId}
             courseId={params.courseId}
             initialData={chapter}
+          />
+          <ChapterDescriptionForm
+            initialData={chapter}
+            courseId={params.courseId}
+            chapterId={params.chapterId}
           />
         </div>
       </div>
