@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Chapter, Course } from '@prisma/client';
 import axios from 'axios';
-import { PlusCircle } from 'lucide-react';
+import { Loader2, PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FC, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { ChaptersList } from './chapters-list';
 
 interface ChaptersFormProps {
   initialData: Course & {
@@ -36,7 +37,7 @@ const formSchema = z.object({
 const ChaptersForm: FC<ChaptersFormProps> = ({ courseId, initialData }) => {
   const router = useRouter();
   const [isCreating, setIsCreating] = useState<boolean>(false);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   const toggleCreating = () => {
     setIsCreating((prev) => !prev);
@@ -62,8 +63,32 @@ const ChaptersForm: FC<ChaptersFormProps> = ({ courseId, initialData }) => {
     }
   };
 
+  const onReorder = async (updateData: { id: string; position: number }[]) => {
+    try {
+      setIsUpdating(true);
+      await axios.put(`/api/courses/${courseId}/chapters/reorder`, {
+        list: updateData,
+      });
+      toast.success('Chapters reordered');
+      router.refresh();
+    } catch (error) {
+      toast.error('Something went wrong');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const onEdit = (id: string) => {
+    router.push(`/teacher/courses/${courseId}/chapters/${id}`);
+  };
+
   return (
     <div className="p-4 mt-6 border rounded-md bg-slate-100">
+      {isUpdating && (
+        <div className="absolute top-0 right-0 flex items-center justify-center w-full h-full bg-slate-500/20 rounded-m">
+          <Loader2 className="w-6 h-6 animate-spin text-sky-700" />
+        </div>
+      )}
       <div className="flex items-center justify-between font-medium">
         Course chapters
         <Button variant="ghost" type="button" onClick={toggleCreating}>
@@ -113,8 +138,17 @@ const ChaptersForm: FC<ChaptersFormProps> = ({ courseId, initialData }) => {
               !initialData.chapters.length && 'text-slate-500 italic'
             )}
           >
-            {!initialData.chapters.length && 'No chapters'}
+            {!initialData.chapters.length ? (
+              'No chapters'
+            ) : (
+              <ChaptersList
+                onEdit={onEdit}
+                onReorder={onReorder}
+                items={initialData.chapters || []}
+              />
+            )}
           </div>
+
           <p className="mt-4 text-xs text-muted-foreground">
             Drag and drop to reorder the chapters
           </p>
