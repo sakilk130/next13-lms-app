@@ -1,5 +1,10 @@
 import { auth } from '@clerk/nextjs';
-import { CircleDollarSign, LayoutDashboard, ListChecks } from 'lucide-react';
+import {
+  CircleDollarSign,
+  File,
+  LayoutDashboard,
+  ListChecks,
+} from 'lucide-react';
 import { redirect } from 'next/navigation';
 
 import { IconBadge } from '@/components/icon-badge';
@@ -10,6 +15,7 @@ import { DescriptionForm } from './components/description-form';
 import { ImageForm } from './components/image-form';
 import { TitleForm } from './components/title-form';
 import { PriceForm } from './components/price-form';
+import { AttachmentForm } from './components/attachment-form';
 
 const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
   const { userId } = auth();
@@ -22,6 +28,13 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
     where: {
       id: params.courseId,
       userId,
+    },
+    include: {
+      attachments: {
+        orderBy: {
+          createdAt: 'asc',
+        },
+      },
     },
   });
 
@@ -88,6 +101,13 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
               <h2 className="text-xl">Sell your course</h2>
             </div>
             <PriceForm initialData={course} courseId={params.courseId} />
+          </div>
+          <div>
+            <div className="flex items-center gap-x-2">
+              <IconBadge icon={File} />
+              <h2 className="text-xl">Recourses & Attachments</h2>
+            </div>
+            <AttachmentForm initialData={course} courseId={params.courseId} />
           </div>
         </div>
       </div>
