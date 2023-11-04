@@ -16,6 +16,7 @@ import { ImageForm } from './components/image-form';
 import { TitleForm } from './components/title-form';
 import { PriceForm } from './components/price-form';
 import { AttachmentForm } from './components/attachment-form';
+import { ChaptersForm } from './components/chapters-form';
 
 const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
   const { userId } = auth();
@@ -30,14 +31,18 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
       userId,
     },
     include: {
+      chapters: {
+        orderBy: {
+          position: 'asc',
+        },
+      },
       attachments: {
         orderBy: {
-          createdAt: 'asc',
+          createdAt: 'desc',
         },
       },
     },
   });
-
   const categories = await db.category.findMany({
     orderBy: {
       name: 'asc',
@@ -54,6 +59,7 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
     course.imageUrl,
     course.price,
     course.categoryId,
+    course.chapters.some((chapter) => chapter.isPublished),
   ];
   const totalFields = requiredFields.length;
   const completedFields = requiredFields.filter((field) => !!field).length;
@@ -93,7 +99,7 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
               <IconBadge icon={ListChecks} />
               <h2 className="text-xl">Course chapters</h2>
             </div>
-            <div>TODO: chapters list</div>
+            <ChaptersForm initialData={course} courseId={params.courseId} />
           </div>
           <div>
             <div className="flex items-center gap-x-2">
