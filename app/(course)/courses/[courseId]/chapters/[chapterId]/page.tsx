@@ -1,13 +1,14 @@
-import { redirect } from 'next/navigation';
 import { File } from 'lucide-react';
+import { redirect } from 'next/navigation';
 
 import { getChapter } from '@/actions/get-chapter';
 import { Banner } from '@/components/banner';
+import { Preview } from '@/components/preview';
 import { Separator } from '@/components/ui/separator';
 import { auth } from '@clerk/nextjs';
 import { CourseEnrollButton } from './components/course-enroll-button';
+import { CourseProgressButton } from './components/course-progress-button';
 import { VideoPlayer } from './components/video-player';
-import { Preview } from '@/components/preview';
 
 const ChapterIdPage = async ({
   params,
@@ -68,7 +69,14 @@ const ChapterIdPage = async ({
         <div>
           <div className="flex flex-col items-center justify-between p-4 md:flex-row">
             <h2 className="mb-2 text-2xl font-semibold">{chapter.title}</h2>
-            {purchase ? null : (
+            {purchase ? (
+              <CourseProgressButton
+                chapterId={params.chapterId}
+                courseId={params.courseId}
+                nextChapterId={nextChapter?.id}
+                isCompleted={!!userProgress?.isCompleted}
+              />
+            ) : (
               <CourseEnrollButton
                 courseId={params.courseId}
                 price={course.price!}
